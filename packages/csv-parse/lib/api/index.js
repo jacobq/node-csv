@@ -3,7 +3,7 @@ import {normalize_columns_array} from './normalize_columns_array.js';
 import {init_state} from './init_state.js';
 import {normalize_options} from './normalize_options.js';
 import {CsvError} from './CsvError.js';
-import {isObject} from './isObject.js';
+import {is_object} from '../utils/is_object.js';
 
 const isRecordEmpty = function(record){
   return record.every((field) => field == null || field.toString && field.toString().trim() === '');
@@ -701,4 +701,4 @@ const transform = function(original_options, options, state) {
 };
 
 
-export {init_state, isObject, normalize_options, transform, CsvError};
+export {init_state, is_object, normalize_options, transform, CsvError};

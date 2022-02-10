@@ -1980,7 +1980,7 @@ class CsvError extends Error {
   }
 }
 
-const isObject = function(obj){
+const is_object = function(obj){
   return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
 };
 
@@ -1992,7 +1992,7 @@ const normalize_columns_array = function(columns){
       normalizedColumns[i] = { disabled: true };
     }else if(typeof column === 'string'){
       normalizedColumns[i] = { name: column };
-    }else if(isObject(column)){
+    }else if(is_object(column)){
       if(typeof column.name !== 'string'){
         throw new CsvError('CSV_OPTION_COLUMNS_MISSING_NAME', [
           'Option columns missing name:',

@@ -1,6 +1,6 @@
 
-const isObject = function(obj){
+const is_object = function(obj){
   return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
 };
 
-export {isObject};
+export {is_object};

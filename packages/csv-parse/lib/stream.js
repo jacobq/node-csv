@@ -2,7 +2,7 @@
 import {
   TransformStream,
 } from 'node:stream/web';
-import {init_state, isObject, normalize_options, transform} from './api/index.js';
+import {init_state, is_object, normalize_options, transform} from './api/index.js';
 
 const parse = (opts) => {
   const options = normalize_options(opts || {});

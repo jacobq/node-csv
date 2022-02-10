@@ -2633,7 +2633,7 @@
                 }
               });
               for (var x = args[i]; i < len; x = args[++i]) {
-                if (isNull(x) || !isObject$1(x)) {
+                if (isNull(x) || !isObject(x)) {
                   str += ' ' + x;
                 } else {
                   str += ' ' + inspect(x);
@@ -3041,19 +3041,19 @@
             }
 
             function isRegExp(re) {
-              return isObject$1(re) && objectToString(re) === '[object RegExp]';
+              return isObject(re) && objectToString(re) === '[object RegExp]';
             }
 
-            function isObject$1(arg) {
+            function isObject(arg) {
               return typeof arg === 'object' && arg !== null;
             }
 
             function isDate(d) {
-              return isObject$1(d) && objectToString(d) === '[object Date]';
+              return isObject(d) && objectToString(d) === '[object Date]';
             }
 
             function isError(e) {
-              return isObject$1(e) &&
+              return isObject(e) &&
                   (objectToString(e) === '[object Error]' || e instanceof Error);
             }
 
@@ -3067,7 +3067,7 @@
 
             function _extend(origin, add) {
               // Don't do anything if add isn't an object
-              if (!add || !isObject$1(add)) return origin;
+              if (!add || !isObject(add)) return origin;
 
               var keys = Object.keys(add);
               var i = keys.length;
@@ -4989,7 +4989,7 @@
               }
             }
 
-            const isObject = function(obj){
+            const is_object = function(obj){
               return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
             };
 
@@ -5001,7 +5001,7 @@
                   normalizedColumns[i] = { disabled: true };
                 }else if(typeof column === 'string'){
                   normalizedColumns[i] = { name: column };
-                }else if(isObject(column)){
+                }else if(is_object(column)){
                   if(typeof column.name !== 'string'){
                     throw new CsvError('CSV_OPTION_COLUMNS_MISSING_NAME', [
                       'Option columns missing name:',
@@ -6277,7 +6277,7 @@
                 const type = typeof argument;
                 if(data === undefined && (typeof argument === 'string' || isBuffer(argument))){
                   data = argument;
-                }else if(options === undefined && isObject(argument)){
+                }else if(options === undefined && is_object(argument)){
                   options = argument;
                 }else if(callback === undefined && type === 'function'){
                   callback = argument;

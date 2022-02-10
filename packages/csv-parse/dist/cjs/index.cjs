@@ -21,7 +21,7 @@ class CsvError extends Error {
   }
 }
 
-const isObject = function(obj){
+const is_object = function(obj){
   return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
 };
 
@@ -33,7 +33,7 @@ const normalize_columns_array = function(columns){
       normalizedColumns[i] = { disabled: true };
     }else if(typeof column === 'string'){
       normalizedColumns[i] = { name: column };
-    }else if(isObject(column)){
+    }else if(is_object(column)){
       if(typeof column.name !== 'string'){
         throw new CsvError('CSV_OPTION_COLUMNS_MISSING_NAME', [
           'Option columns missing name:',
@@ -1309,7 +1309,7 @@ const parse = function(){
     const type = typeof argument;
     if(data === undefined && (typeof argument === 'string' || Buffer.isBuffer(argument))){
       data = argument;
-    }else if(options === undefined && isObject(argument)){
+    }else if(options === undefined && is_object(argument)){
       options = argument;
     }else if(callback === undefined && type === 'function'){
       callback = argument;

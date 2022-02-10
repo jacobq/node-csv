@@ -7,7 +7,7 @@ additional information.
 */
 
 import { Transform } from 'stream';
-import {init_state, isObject, normalize_options, transform} from './api/index.js';
+import {init_state, is_object, normalize_options, transform} from './api/index.js';
 import {CsvError} from './api/CsvError.js';
 
 class Parser extends Transform {
@@ -57,7 +57,7 @@ const parse = function(){
     const type = typeof argument;
     if(data === undefined && (typeof argument === 'string' || Buffer.isBuffer(argument))){
       data = argument;
-    }else if(options === undefined && isObject(argument)){
+    }else if(options === undefined && is_object(argument)){
       options = argument;
     }else if(callback === undefined && type === 'function'){
       callback = argument;

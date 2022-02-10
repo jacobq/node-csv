@@ -1,5 +1,5 @@
 
-import ResizeableBuffer from './ResizeableBuffer.js';
+import ResizeableBuffer from '../utils/ResizeableBuffer.js';
 
 const init_state = function(options){
   return {

@@ -1,7 +1,7 @@
 
 import {normalize_columns_array} from './normalize_columns_array.js';
 import {CsvError} from './CsvError.js';
-import {underscore} from './underscore.js';
+import {underscore} from '../utils/underscore.js';
 
 const normalize_options = function(opts){
   const options = {};
