@@ -9,8 +9,6 @@ const parse = (opts) => {
   const state = init_state(options);
   const api = transform(opts, options, state);
   return new TransformStream({
-    async start(controller) {
-    },
     async transform(chunk, controller) {
       const err = api.__parse(chunk, false, (record) => {
         controller.enqueue(record);
