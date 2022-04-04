@@ -5495,9 +5495,6 @@ class Stringifier extends Transform {
     if(err !== undefined) throw err;
     // Expose options
     this.options = options;
-    this.options.on_record = (...args) => {
-      this.emit('record', ...args);
-    };
     // Internal state
     this.state = {
       stop: false
@@ -5507,6 +5504,9 @@ class Stringifier extends Transform {
       records: 0
     };
     this.api = stringifier(this.options, this.state, this.info);
+    this.api.options.on_record = (...args) => {
+      this.emit('record', ...args);
+    };
   }
   _transform(chunk, encoding, callback){
     if(this.state.stop === true){

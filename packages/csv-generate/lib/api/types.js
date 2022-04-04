@@ -3,7 +3,7 @@ import {random} from './random.js';
 
 const types = {
   // Generate an ASCII value.
-  ascii: function(options){
+  ascii: function({options}){
     const column = [];
     const nb_chars = Math.ceil(random(options) * options.maxWordLength);
     for(let i=0; i<nb_chars; i++){
@@ -13,11 +13,11 @@ const types = {
     return column.join('');
   },
   // Generate an integer value.
-  int: function(options){
+  int: function({options}){
     return Math.floor(random(options) * Math.pow(2, 52));
   },
   // Generate an boolean value.
-  bool: function(options){
+  bool: function({options}){
     return Math.floor(random(options) * 2);
   }
 };

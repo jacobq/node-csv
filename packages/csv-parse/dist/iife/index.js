@@ -6232,11 +6232,12 @@ var csv_parse = (function (exports) {
               constructor(opts = {}){
                 super({...{readableObjectMode: true}, ...opts, encoding: null});
                 this.api = transform(opts);
-                this.state = this.api.state;
-                this.options = this.api.options;
-                this.options.on_skip = (err, chunk) => {
+                this.api.options.on_skip = (err, chunk) => {
                   this.emit('skip', err, chunk);
                 };
+                // Backward compatibility
+                this.state = this.api.state;
+                this.options = this.api.options;
                 this.info = this.api.info;
               }
               // Implementation of `Transform._transform`

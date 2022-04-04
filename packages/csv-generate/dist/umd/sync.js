@@ -5063,7 +5063,7 @@
 
             const types = {
               // Generate an ASCII value.
-              ascii: function(options){
+              ascii: function({options}){
                 const column = [];
                 const nb_chars = Math.ceil(random(options) * options.maxWordLength);
                 for(let i=0; i<nb_chars; i++){
@@ -5073,11 +5073,11 @@
                 return column.join('');
               },
               // Generate an integer value.
-              int: function(options){
+              int: function({options}){
                 return Math.floor(random(options) * Math.pow(2, 52));
               },
               // Generate an boolean value.
-              bool: function(options){
+              bool: function({options}){
                 return Math.floor(random(options) * 2);
               }
             };
@@ -5149,7 +5149,7 @@
                 data.push(state.fixed_size_buffer);
               }
               // eslint-disable-next-line
-                while(true){
+              while(true){
                 // Time for some rest: flush first and stop later
                 if((state.count_created === options.length) || (options.end && Date.now() > options.end) || (options.duration && Date.now() > state.start_time + options.duration)){
                   // Flush
@@ -5171,15 +5171,26 @@
                 let record = [];
                 let recordLength;
                 options.columns.forEach((fn) => {
-                  record.push(fn(options));
+                  const result = fn({options: options, state: state});
+                  const type = typeof result;
+                  if(result !== null && type !== 'string' && type !== 'number'){
+                    throw Error([
+                      'INVALID_VALUE:',
+                      'values returned by column function must be',
+                      'a string, a number or null,',
+                      `got ${JSON.stringify(result)}`
+                    ].join(' '));
+                  }
+                  record.push(result);
                 });
                 // Obtain record length
                 if(options.objectMode){
                   recordLength = 0;
                   // recordLength is currently equal to the number of columns
                   // This is wrong and shall equal to 1 record only
-                  for(const column of record)
+                  for(const column of record){
                     recordLength += column.length;
+                  }
                 }else {
                   // Stringify the record
                   record = (state.count_created === 0 ? '' : options.rowDelimiter)+record.join(options.delimiter);
