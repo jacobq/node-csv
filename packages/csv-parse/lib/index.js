@@ -7,18 +7,20 @@ additional information.
 */
 
 import { Transform } from 'stream';
-import {init_state, is_object, normalize_options, transform} from './api/index.js';
+import {is_object} from './utils/is_object.js';
+import {transform} from './api/index.js';
 import {CsvError} from './api/CsvError.js';
 
 class Parser extends Transform {
   constructor(opts = {}){
     super({...{readableObjectMode: true}, ...opts, encoding: null});
-    this.options = normalize_options(opts);
-    this.options.on_skip = (err, chunk) => {
+    this.api = transform(opts);
+    this.api.options.on_skip = (err, chunk) => {
       this.emit('skip', err, chunk);
     };
-    this.state = init_state(this.options);
-    this.api = transform(opts, this.options, this.state);
+    // Backward compatibility
+    this.state = this.api.state;
+    this.options = this.api.options;
     this.info = this.api.info;
   }
   // Implementation of `Transform._transform`
@@ -26,7 +28,7 @@ class Parser extends Transform {
     if(this.state.stop === true){
       return;
     }
-    const err = this.api.__parse(buf, false, (record) => {
+    const err = this.api.parse(buf, false, (record) => {
       this.push.call(this, record);
     }, () => {
       this.push.call(this, null);
@@ -41,7 +43,7 @@ class Parser extends Transform {
     if(this.state.stop === true){
       return;
     }
-    const err = this.api.__parse(undefined, true, (record) => {
+    const err = this.api.parse(undefined, true, (record) => {
       this.push.call(this, record);
     }, () => {
       this.push.call(this, null);

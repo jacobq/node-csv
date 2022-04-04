@@ -2551,7 +2551,7 @@ const boms = {
   'utf16le': Buffer.from([255, 254])
 };
 
-const transform = function(original_options, options, state) {
+const transform = function(original_options = {}) {
   const info = {
     bytes: 0,
     comment_lines: 0,
@@ -2560,11 +2560,12 @@ const transform = function(original_options, options, state) {
     lines: 1,
     records: 0
   };
+  const options = normalize_options(original_options);
   return {
     info: info,
     original_options: original_options,
     options: options,
-    state: state,
+    state: init_state(options),
     __needMoreData: function(i, bufLen, end){
       if(end) return false;
       const {quote} = this.options;
@@ -2581,7 +2582,7 @@ const transform = function(original_options, options, state) {
       return numOfCharLeft < requiredLength;
     },
     // Central parser implementation
-    __parse: function(nextBuf, end, push, close){
+    parse: function(nextBuf, end, push, close){
       const {bom, comment, escape, from_line, ltrim, max_record_size, quote, raw, relax_quotes, rtrim, skip_empty_lines, to, to_line} = this.options;
       let {record_delimiter} = this.options;
       const {bomSkipped, previousBuf, rawBuffer, escapeIsQuote} = this.state;
@@ -3226,20 +3227,18 @@ const parse = function(data, opts={}){
     data = Buffer.from(data);
   }
   const records = opts && opts.objname ? {} : [];
-  const options = normalize_options(opts);
-  const state = init_state(options);
-  const parser = transform(opts, options, state);
+  const parser = transform(opts);
   const push = (record) => {
-    if(options.objname === undefined)
+    if(parser.options.objname === undefined)
       records.push(record);
     else {
       records[record[0]] = record[1];
     }
   };
   const close = () => {};
-  const err1 = parser.__parse(data, false, push, close);
+  const err1 = parser.parse(data, false, push, close);
   if(err1 !== undefined) throw err1;
-  const err2 = parser.__parse(undefined, true, push, close);
+  const err2 = parser.parse(undefined, true, push, close);
   if(err2 !== undefined) throw err2;
   return records;
 };

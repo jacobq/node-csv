@@ -4972,6 +4972,10 @@
               return dest;
             };
 
+            const is_object = function(obj){
+              return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
+            };
+
             class CsvError extends Error {
               constructor(code, message, options, ...contexts) {
                 if(Array.isArray(message)) message = message.join(' ');
@@ -4988,10 +4992,6 @@
                 }
               }
             }
-
-            const is_object = function(obj){
-              return (typeof obj === 'object' && obj !== null && !Array.isArray(obj));
-            };
 
             const normalize_columns_array = function(columns){
               const normalizedColumns = [];
@@ -5560,7 +5560,7 @@
               'utf16le': Buffer.from([255, 254])
             };
 
-            const transform = function(original_options, options, state) {
+            const transform = function(original_options = {}) {
               const info = {
                 bytes: 0,
                 comment_lines: 0,
@@ -5569,11 +5569,12 @@
                 lines: 1,
                 records: 0
               };
+              const options = normalize_options(original_options);
               return {
                 info: info,
                 original_options: original_options,
                 options: options,
-                state: state,
+                state: init_state(options),
                 __needMoreData: function(i, bufLen, end){
                   if(end) return false;
                   const {quote} = this.options;
@@ -5590,7 +5591,7 @@
                   return numOfCharLeft < requiredLength;
                 },
                 // Central parser implementation
-                __parse: function(nextBuf, end, push, close){
+                parse: function(nextBuf, end, push, close){
                   const {bom, comment, escape, from_line, ltrim, max_record_size, quote, raw, relax_quotes, rtrim, skip_empty_lines, to, to_line} = this.options;
                   let {record_delimiter} = this.options;
                   const {bomSkipped, previousBuf, rawBuffer, escapeIsQuote} = this.state;
@@ -6233,12 +6234,12 @@
             class Parser extends Transform {
               constructor(opts = {}){
                 super({...{readableObjectMode: true}, ...opts, encoding: null});
-                this.options = normalize_options(opts);
+                this.api = transform(opts);
+                this.state = this.api.state;
+                this.options = this.api.options;
                 this.options.on_skip = (err, chunk) => {
                   this.emit('skip', err, chunk);
                 };
-                this.state = init_state(this.options);
-                this.api = transform(opts, this.options, this.state);
                 this.info = this.api.info;
               }
               // Implementation of `Transform._transform`
@@ -6246,7 +6247,7 @@
                 if(this.state.stop === true){
                   return;
                 }
-                const err = this.api.__parse(buf, false, (record) => {
+                const err = this.api.parse(buf, false, (record) => {
                   this.push.call(this, record);
                 }, () => {
                   this.push.call(this, null);
@@ -6261,7 +6262,7 @@
                 if(this.state.stop === true){
                   return;
                 }
-                const err = this.api.__parse(undefined, true, (record) => {
+                const err = this.api.parse(undefined, true, (record) => {
                   this.push.call(this, record);
                 }, () => {
                   this.push.call(this, null);

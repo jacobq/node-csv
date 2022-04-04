@@ -3,7 +3,6 @@ import {normalize_columns_array} from './normalize_columns_array.js';
 import {init_state} from './init_state.js';
 import {normalize_options} from './normalize_options.js';
 import {CsvError} from './CsvError.js';
-import {is_object} from '../utils/is_object.js';
 
 const isRecordEmpty = function(record){
   return record.every((field) => field == null || field.toString && field.toString().trim() === '');
@@ -30,7 +29,7 @@ const boms = {
   'utf16le': Buffer.from([255, 254])
 };
 
-const transform = function(original_options, options, state) {
+const transform = function(original_options = {}) {
   const info = {
     bytes: 0,
     comment_lines: 0,
@@ -39,11 +38,12 @@ const transform = function(original_options, options, state) {
     lines: 1,
     records: 0
   };
+  const options = normalize_options(original_options);
   return {
     info: info,
     original_options: original_options,
     options: options,
-    state: state,
+    state: init_state(options),
     __needMoreData: function(i, bufLen, end){
       if(end) return false;
       const {quote} = this.options;
@@ -60,7 +60,7 @@ const transform = function(original_options, options, state) {
       return numOfCharLeft < requiredLength;
     },
     // Central parser implementation
-    __parse: function(nextBuf, end, push, close){
+    parse: function(nextBuf, end, push, close){
       const {bom, comment, escape, from_line, ltrim, max_record_size, quote, raw, relax_quotes, rtrim, skip_empty_lines, to, to_line} = this.options;
       let {record_delimiter} = this.options;
       const {bomSkipped, previousBuf, rawBuffer, escapeIsQuote} = this.state;
@@ -701,4 +701,4 @@ const transform = function(original_options, options, state) {
 };
 
 
-export {init_state, is_object, normalize_options, transform, CsvError};
+export {transform, CsvError};

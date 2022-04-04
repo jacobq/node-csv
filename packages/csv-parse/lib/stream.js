@@ -2,29 +2,26 @@
 import {
   TransformStream,
 } from 'node:stream/web';
-import {init_state, is_object, normalize_options, transform} from './api/index.js';
+import {transform} from './api/index.js';
 
 const parse = (opts) => {
-  const options = normalize_options(opts || {});
-  const state = init_state(options);
-  const api = transform(opts, options, state);
+  const api = transform(opts);
   return new TransformStream({
     async transform(chunk, controller) {
-      const err = api.__parse(chunk, false, (record) => {
+      const err = api.parse(chunk, false, (record) => {
         controller.enqueue(record);
       }, () => {
         controller.close()
       });
     },
     async flush(controller){
-      const err = api.__parse(undefined, true, (record) => {
+      const err = api.parse(undefined, true, (record) => {
         controller.enqueue(record);
       }, () => {
         controller.close()
       });
     }
   });
-  // return new Generator(options || {})
 }
 
 export {parse};
